@@ -34,9 +34,9 @@ BOT_TOKEN = os.environ.get("BOT_TOKEN")
 
 DATABASE_URL = os.environ.get("DATABASE_URL")
 
-TARGET_USERNAME = os.environ.get(
-    "TARGET_USERNAME",
-    "FullPicks1"
+TARGET_WALLET = os.environ.get(
+    "TARGET_WALLET",
+    "0x9b1e0334569aa1768a07705a859686aad58e82c9"
 )
 
 POLL_INTERVAL = int(
@@ -55,7 +55,7 @@ def home():
     return {
         "status": "online",
         "bot": "polymarket-spy-bot",
-        "target": TARGET_USERNAME
+        "target": TARGET_WALLET
     }, 200
 
 
@@ -185,7 +185,7 @@ def fetch_activity():
     params = {
         "limit": 20,
         "offset": 0,
-        "user": TARGET_USERNAME
+        "user": TARGET_WALLET
     }
 
     headers = {
@@ -398,8 +398,8 @@ async def start(
     texto = f"""
 🤖 POLYMARKET SPY BOT
 
-Monitorando:
-{TARGET_USERNAME}
+Monitorando Wallet:
+{TARGET_WALLET}
 
 Você receberá alertas automáticos quando o usuário fizer novas entradas.
 
