@@ -233,72 +233,134 @@ def escape_md(text):
 
     return text
 
+def format_money(value):
+    try:
+        value = float(value)
+        return f"${value:,.0f}"
+    except Exception:
+        return "N/A"
+
+
+def format_price_and_odd(price):
+    try:
+        price = float(price)
+
+        percentage = price * 100
+
+        if price > 0:
+            odd = 1 / price
+        else:
+            odd = 0
+
+        return f"{percentage:.1f}% (Odd {odd:.2f})"
+
+    except Exception:
+        return "N/A"
+
+
+def confidence_label(price):
+    try:
+        price = float(price)
+        percentage = price * 100
+
+        if percentage >= 80:
+            return "🟩🟩 Muito Alta"
+
+        if percentage >= 60:
+            return "🟩 Alta"
+
+        if percentage >= 40:
+            return "🟨🟨 Média"
+
+        if percentage >= 20:
+            return "🟧 Baixa"
+
+        return "🟥 Muito Baixa"
+
+    except Exception:
+        return "N/A"
+
+
+def suggested_unit(usdc_value):
+    try:
+        value = float(usdc_value)
+
+        if value >= 20000:
+            return "2.0"
+
+        if value >= 10000:
+            return "1.5"
+
+        if value >= 3000:
+            return "1.0"
+
+        if value >= 1000:
+            return "0.5"
+
+        return "0.25"
+
+    except Exception:
+        return "N/A"
+
 
 def build_message(trade):
 
-    title = trade.get(
-        "title",
-        "Mercado desconhecido"
-    )
+    title = trade.get("title", "Mercado desconhecido")
 
-    side = trade.get(
-        "side",
-        "N/A"
-    )
+    outcome = trade.get("outcome", "N/A")
 
-    outcome = trade.get(
-        "outcome",
-        ""
-    )
+    price = trade.get("price", None)
 
-    price = trade.get(
-        "price",
-        "N/A"
-    )
+    size = trade.get("size", None)
 
-    size = trade.get(
-        "size",
-        "N/A"
-    )
+    usdc_size = trade.get("usdcSize", None)
+
+    trader_name = trade.get("name") or trade.get("username") or TARGET_USERNAME
 
     slug = trade.get("slug")
+    event_slug = trade.get("eventSlug")
 
-    if slug:
-        link = (
-            f"https://polymarket.com/market/{slug}"
-        )
+    if event_slug:
+        link = f"https://polymarket.com/event/{event_slug}"
+    elif slug:
+        link = f"https://polymarket.com/market/{slug}"
     else:
         link = "https://polymarket.com"
 
-    if side.upper() == "BUY":
+    invested = usdc_size
 
-        if outcome.upper() == "YES":
-            operation = "Comprou SIM"
+    if invested is None and size is not None and price is not None:
+        try:
+            invested = float(size) * float(price)
+        except Exception:
+            invested = None
 
-        elif outcome.upper() == "NO":
-            operation = "Comprou NÃO"
-
-        else:
-            operation = "Comprou"
-
-    elif side.upper() == "SELL":
-        operation = "Vendeu"
-
-    else:
-        operation = side
+    close_date = (
+        trade.get("endDate")
+        or trade.get("end_date")
+        or trade.get("endDateIso")
+        or "N/A"
+    )
 
     message = f"""
-🚨 *NOVA ENTRADA DETECTADA \\- FULLPICKS1*
+🎯 {trader_name}
 
-*Mercado:* {escape_md(title)}
+{title}
 
-*Operação:* {escape_md(operation)}
+Lado: {outcome}
 
-*Preço/Cotação:* ${escape_md(price)}
+Cotação: {format_price_and_odd(price)}
 
-*Quantidade/Valor:* {escape_md(size)}
+Investido: {format_money(invested)}
 
-*Link Direto:* [Abrir mercado]({link})
+Unidade sugerida: {suggested_unit(invested)}
+
+Confiança: {confidence_label(price)}
+
+⏰ Encerra: {close_date}
+
+🔗 Ver mercado:
+{link}
 """
 
     return message
