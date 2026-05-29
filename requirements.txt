@@ -1,4 +1,4 @@
-python-telegram-bot>=20,<23
+python-telegram-bot[job-queue]>=20,<23
 flask>=3,<4
 requests>=2.31,<3
 psycopg2-binary>=2.9,<3
