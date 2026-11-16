@@ -38,7 +38,7 @@ polymarket-spy-bot/
 
 ## Configuração
 
-Crie as variáveis de ambiente necessárias antes de executar o projeto.
+Use [`.env.example`](.env.example) como referência para configurar as variáveis no ambiente local ou no serviço de hospedagem. O arquivo contém somente nomes e valores de demonstração, nunca credenciais reais.
 
 Principais variáveis:
 
@@ -97,9 +97,11 @@ O código inclui:
 
 - modularizar `bot.py` em pacotes menores;
 - adicionar testes automatizados;
-- criar `.env.example` documentado;
+- manter o modelo `.env.example` alinhado às opções do código;
 - adicionar CI para lint e testes;
 - adicionar métricas e observabilidade.
+
+> **Nota de segurança:** este código é experimental e depende de credenciais externas. Não exponha o serviço ou seus dados sem avaliar autenticação, permissões e requisitos de operação. Integrações e resultados reais não foram validados nesta revisão de documentação.
 
 ## Autor
 
